@@ -20,16 +20,11 @@ const Navbar = () => {
       {session ? (
         <div className="relative flex items-center gap-2">
         
-          <button
-            onClick={() => signOut()}
-            className="text-white bg-gradient-to-br from-purple-600 to-blue-500 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 font-medium rounded-lg text-sm px-4 py-2 text-center"
-          >
-            Logout
-          </button>
 
           <button
             id="dropdownDefaultButton"
             onClick={() => setShowDropDown(!showDropDown)}
+            onBlur={()=>setTimeout(()=>setShowDropDown(false),100)}
             data-dropdown-toggle="dropdown"
             className="ml-2 text-white bg-gray-700 hover:bg-gray-600 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-3 py-2 text-center inline-flex items-center dark:bg-gray-600 dark:hover:bg-gray-500 dark:focus:ring-gray-800"
             type="button"
@@ -69,21 +64,14 @@ const Navbar = () => {
                 </Link>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  href='#'
                   className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
                 >
-                  Settings
-                </a>
+                  Your Page
+                </Link>
               </li>
-              <li>
-                <a
-                  href="#"
-                  className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                >
-                  Earnings
-                </a>
-              </li>
+            
               <li>
                 <button
                   onClick={() => signOut()}

@@ -7,9 +7,11 @@ const Login = () => {
     const router = useRouter()
     useEffect(() => {
         if(session){
-            router.push(`/${session.user.name}`)
+
+            router.push("/dashboard")
         }
     }, [session])
+    
     return (<>
     <div className=' justify-center items-center text-white py-20 flex flex-col'>
 
