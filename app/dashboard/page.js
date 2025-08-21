@@ -3,8 +3,10 @@ import React, { useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
+import { useAuthStore } from "@/store/dashboardHandler";
 const Dashboard = () => {
   const { data: session } = useSession();
+  const {dashUser,error,updateDashboard} = useAuthStore();
   const router = useRouter();
   const {
     register,
@@ -29,7 +31,19 @@ const Dashboard = () => {
     }
   }, [session, router]);
   const onSubmit = (data) => {
-    console.log(data);
+    try {
+      updateDashboard({
+        name:data.name,
+        email:data.email,
+        username:data.username,
+        profileImage:"",
+        bannerImage:"",
+        bio:data.bio
+      });
+      console.log(dashUser);
+    } catch (err) {
+      console.log(error);
+    }
     reset();
   };
 
@@ -113,9 +127,7 @@ const Dashboard = () => {
               id="profileImage"
               type="file"
               className="file:mr-4 file:rounded-md file:border-0 file:bg-blue-600 file:px-3 file:py-2 file:text-white file:text-sm file:hover:bg-blue-500 bg-gray-800/60 border border-gray-700 rounded-md px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500"
-              {...register("profileImage", {
-                required: { value: true, message: "Profile Image is required" },
-              })}
+              {...register("profileImage")}
             />
             <p className="text-red-500">{errors.profileImage?.message}</p>
           </div>
@@ -128,9 +140,7 @@ const Dashboard = () => {
               id="bannerImage"
               type="file"
               className="file:mr-4 file:rounded-md file:border-0 file:bg-blue-600 file:px-3 file:py-2 file:text-white file:text-sm file:hover:bg-blue-500 bg-gray-800/60 border border-gray-700 rounded-md px-3 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500/40 focus:border-blue-500"
-              {...register("bannerImage", {
-                required: { value: true, message: "Banner Image is required" },
-              })}
+              {...register("bannerImage")}
             />
             <p className="text-red-500">{errors.bannerImage?.message}</p>
           </div>
