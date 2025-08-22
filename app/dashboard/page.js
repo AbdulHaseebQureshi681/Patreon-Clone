@@ -36,8 +36,8 @@ const Dashboard = () => {
         name:data.name,
         email:data.email,
         username:data.username,
-        profileImage:"",
-        bannerImage:"",
+        profileImage:data.profileImage,
+        bannerImage:data.bannerImage,
         bio:data.bio
       });
       console.log(dashUser);
@@ -54,7 +54,7 @@ const Dashboard = () => {
       </h1>
 
       <div className="rounded-lg border border-gray-800 bg-gray-900/40 backdrop-blur-sm">
-        <form className="p-6 md:p-8 grid gap-5" action="#">
+        <form className="p-6 md:p-8 grid gap-5" action="#" onSubmit={handleSubmit(onSubmit)} encType="multipart/form-data">
           <div className="grid gap-2">
             <label className="text-sm text-slate-300" htmlFor="name">
               Name
@@ -171,7 +171,6 @@ const Dashboard = () => {
 
           <div className="pt-2">
             <button
-            onClick={handleSubmit(onSubmit)}
               type="submit"
               className="inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
             >

@@ -32,8 +32,12 @@ callbacks: {
     return true; 
   },
   async session({ session}) {
+    await connectDb();
     const currentUser = await User.findOne({ email: session.user.email });
     session.user.username = currentUser.username;
+    session.user.profileImage = currentUser.profileImage;
+    session.user.bannerImage = currentUser.bannerImage;
+    session.user.bio = currentUser.bio;
     return session
   }
 }
