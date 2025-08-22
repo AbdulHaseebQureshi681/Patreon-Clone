@@ -1,8 +1,13 @@
-import React from 'react'
+"use client"
+import React, { useEffect } from 'react'
 import DynamicUserMain from '@/components/DynamicUserMain'
 import { FaSortAmountDownAlt, FaSearch } from 'react-icons/fa'
 import PostTemplate from '@/components/PostTemplate'
+import { useAuthStore } from '@/store/dashboardHandler'
+import { useParams } from 'next/navigation'
 export default function Page({ params }) {
+  const { username } = useParams()
+  const {getUser, requestedUser} = useAuthStore()
   const post = {
     image: '/temppost.png',
     title: 'Sample Title Image Ahh',
@@ -11,11 +16,18 @@ export default function Page({ params }) {
     likes: 12,
     comments: 12,
   }
+ 
+  useEffect(() => {
+    if (username) {
+      const decoded = decodeURIComponent(username)
+      getUser(decoded)
+    }
+  }, [username, getUser])
   return (
     <>
-      <DynamicUserMain params={params} />
+      <DynamicUserMain requestedUser={requestedUser} />
       <div className="recentpost text-white flex justify-center items-center font-bold text-2xl">
-        Recent posts by {params.username}
+        Recent posts by {username}
       </div>
       <div className="post-objs flex justify-center items-center gap-2  text-white my-4">
       <div className='border border-white py-1 px-4 rounded-lg' >Post type</div>

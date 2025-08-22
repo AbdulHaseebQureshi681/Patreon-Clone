@@ -1,6 +1,5 @@
 import {create} from 'zustand';
 import axios from 'axios';
-
 // Use relative API base to work in all environments
 const API_URL = '';
 
@@ -10,6 +9,7 @@ axios.defaults.withCredentials = true;
 export const useAuthStore = create((set) => ({
   dashUser: null,
   error: null,
+  requestedUser: null,
   updateDashboard: async(data) => {
     try {
       // Build multipart form data so files are transmitted correctly
@@ -32,6 +32,13 @@ export const useAuthStore = create((set) => ({
     } catch (error) {
       set({ error: error?.response?.data?.error || error.message });
     }
- 
-}
+  },
+  getUser: async(username) => {
+    try {
+      const response = await axios.get(`${API_URL}/api/getuser/${username}`);
+      set({ requestedUser: response.data.user, error: null });
+    } catch (error) {
+      set({ error: error?.response?.data?.error || error.message });
+    }
+  }
 }));

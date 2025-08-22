@@ -1,32 +1,31 @@
 "use client"
-import React from 'react'
+import React, { useEffect, useState }    from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {FaFacebook, FaInstagram, FaTiktok, FaYoutube} from 'react-icons/fa'
-
-const DynamicUserMain = ({params}) => {
+const DynamicUserMain = ({requestedUser}) => {
   const pathname = usePathname()
-  const resolvedParams = React.use(params)
-  const username = resolvedParams.username
-  const base = `/${username}`
+  const base = `/${requestedUser?.username}`
   const tabs = [
     { label: 'Home', href: base },
     { label: 'Collections', href: `${base}/collections` },
     { label: 'About', href: `${base}/about` },
   ]
 
+
+
   return (<>
    
     <div className="img w-full relative">
-      <Image className='object-cover w-full' src="/header.png" alt="logo" width={1200} height={200} />
+      <Image className='object-cover w-full' src={requestedUser?.bannerImage || "/header.png"} alt="banner" width={1200} height={200} />
     <div className="pfp absolute -bottom-14  right-[45.5%] border border-white rounded-2xl">
-      <Image className=' rounded-2xl  '  src="/pfp.jpg" alt="logo" width={120} height={120} />
+      <Image className=' rounded-2xl  '  src={requestedUser?.profileImage || "/pfp.jpg"} alt="profile" width={120} height={120} />
     </div>
     </div>
     <div className="text-white flex flex-col gap-2 justify-center items-center my-16">
-    <div className=' text-3xl font-bold'>{username.replaceAll("%20", " ")}</div>
-    <div className='text-slate-50' >Creating Mandolin Videos, Lessons, Transcriptions and More</div>
+    <div className=' text-3xl font-bold'>{requestedUser?.username.replaceAll("%20", " ")}</div>
+    <div className='text-slate-50' >{requestedUser?.bio}</div>
     <div className='flex items-center gap-2 text-slate-400'>11,007 members<div className='w-1 h-1 rounded-full bg-white'></div>729 Posts</div>
     </div>
     <div className="flex flex-col gap-2 -mt-12 items-center ">
