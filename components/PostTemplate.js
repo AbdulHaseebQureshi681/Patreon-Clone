@@ -1,6 +1,7 @@
 import React from 'react'
 import Image from 'next/image'
 import { FaHeart, FaComment, FaShare } from 'react-icons/fa'
+import Link from 'next/link'
 const PostTemplate = ({post}) => {
   return (
     <div className="post-template my-6 sm:my-10 flex flex-col justify-center items-center text-left px-4">
@@ -18,7 +19,7 @@ const PostTemplate = ({post}) => {
       {new Date(post.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
     </div>
     <div className="descrip text-sm sm:text-base">{post.content.slice(0, 100)}...</div>
-    <div className="viewpost text-sm underline my-2 cursor-pointer hover:text-blue-500">View post</div>
+    <Link href={`/post/${post._id}`} className="viewpost text-sm underline my-2 cursor-pointer hover:text-blue-500">View post</Link>
     <div className="iconsbar flex justify-between items-center text-gray-400 mt-2">
       <div className='flex items-center gap-4'>
 

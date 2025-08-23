@@ -2,7 +2,6 @@ import {create} from 'zustand';
 import axios from 'axios';
 // Use relative API base to work in all environments
 const API_URL = '';
-
 axios.defaults.withCredentials = true;
 
 
@@ -12,6 +11,7 @@ export const useAuthStore = create((set) => ({
   requestedUser: null,
   post: null,
   posts: null,
+  alreadyLiked: false,
   updateDashboard: async(data) => {
     try {
       // Build multipart form data so files are transmitted correctly
@@ -69,5 +69,21 @@ export const useAuthStore = create((set) => ({
     } catch (error) {
       set({ error: error?.response?.data?.error || error.message });
     }
-  }
+  },
+  getPost: async(postid) => {
+    try {
+      const response = await axios.get(`${API_URL}/api/getpost/${postid}`);
+      set({ post: response.data.post, error: null });
+    } catch (error) {
+      set({ error: error?.response?.data?.error || error.message });
+    }
+  },
+  incrementLike: async(postid, session) => {
+    try {
+      const response = await axios.post(`${API_URL}/api/getpost/${postid}/incrementlike`, { session });
+      set({ post: response.data.post, error: null, alreadyLiked: response.data.alreadyLiked });
+    } catch (error) {
+      set({ error: error?.response?.data?.error || error.message });
+    }
+  },
 }));

@@ -8,14 +8,7 @@ import { useParams } from 'next/navigation'
 export default function Page({ params }) {
   const { username } = useParams()
   const {getUser, requestedUser, getPosts, posts} = useAuthStore()
-  const post = {
-    image: '/temppost.png',
-    title: 'Sample Title Image Ahh',
-    time: '2 days ago',
-    description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quod. Lorem ipsum dolor sit amet consectetur adipisicing elit. Labore unde repellat fugit officiis repudiandae? Tempore nemo quae molestiae perferendis maiores harum quod dolor veniam animi ratione, repudiandae suscipit. Sit rerum provident illum.',
-    likes: 12,
-    comments: 12,
-  }
+ 
  
   useEffect(() => {
     if (username) {
