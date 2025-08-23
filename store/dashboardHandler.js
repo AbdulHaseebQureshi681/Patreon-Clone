@@ -10,6 +10,8 @@ export const useAuthStore = create((set) => ({
   dashUser: null,
   error: null,
   requestedUser: null,
+  post: null,
+  posts: null,
   updateDashboard: async(data) => {
     try {
       // Build multipart form data so files are transmitted correctly
@@ -37,6 +39,33 @@ export const useAuthStore = create((set) => ({
     try {
       const response = await axios.get(`${API_URL}/api/getuser/${username}`);
       set({ requestedUser: response.data.user, error: null });
+    } catch (error) {
+      set({ error: error?.response?.data?.error || error.message });
+    }
+  },
+  uploadPost: async(data) => {
+    try {
+      const formData = new FormData();
+      formData.append('title', data.title);
+      formData.append('content', data.content);
+      const imageFile = data?.image?.[0] ?? data?.image; // support FileList or File
+      if (imageFile) {
+        formData.append('image', imageFile);
+      }
+      formData.append('user', data.user);
+
+      const response = await axios.post(`${API_URL}/api/uploadpost`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      set({ post: response.data.post, error: null });
+    } catch (error) {
+      set({ error: error?.response?.data?.error || error.message });
+    }
+  },
+  getPosts: async(username) => {
+    try {
+      const response = await axios.get(`${API_URL}/api/getposts/${username}`);
+      set({ posts: response.data.posts, error: null });
     } catch (error) {
       set({ error: error?.response?.data?.error || error.message });
     }

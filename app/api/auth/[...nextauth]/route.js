@@ -38,6 +38,7 @@ callbacks: {
     session.user.profileImage = currentUser.profileImage;
     session.user.bannerImage = currentUser.bannerImage;
     session.user.bio = currentUser.bio;
+    session.user._id = currentUser._id;
     return session
   }
 }
