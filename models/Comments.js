@@ -2,6 +2,11 @@ import mongoose from "mongoose";
 const {Schema} = mongoose;
 const CommentSchema = new Schema(
     {
+      comId: {
+        type: String,
+        required: true,
+        unique: true,
+      },
       post: {
         type: Schema.Types.ObjectId,
         ref: "Post",

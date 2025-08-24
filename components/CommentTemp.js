@@ -3,17 +3,77 @@ import { useState, useRef, useEffect } from 'react';
 import { CommentSection } from 'react-comments-section'
 import 'react-comments-section/dist/index.css';
 import { useSession } from 'next-auth/react'
+import { useCommentsStore } from '@/store/commentsHandler'
+import {useParams} from 'next/navigation'
 export default function Comments() {
+  const { uploadComment , getComments , comments , finalComments , deleteComment , editComment , error } = useCommentsStore();
   const { data: session, status } = useSession();
   const user = session?.user;
+  const {postid} = useParams();
+
+  useEffect(() => {
+    if (!postid) return;
+    const id = decodeURIComponent(postid);
+    getComments(id);
+    
+  }, [postid,getComments]);
+
   if (status === 'loading') return null; // or a skeleton/loader
   // Close emoji picker when clicking outside
+  
+const onSubmitAction = (data) => {
+
+    const {text ,userId ,comId} = data;
+    console.log(data);
+    uploadComment({text:text , parentid:null ,userid:userId ,comId:comId,postid:postid});
+   
+}
+
+const onReplyAction = (data) => {
+  console.log(data);
+  const {text ,userId ,comId , parentid} = data;
  
+  // uploadComment({text:text , parentid:parentid ,userid:userId ,comId:comId,postid:postid});
+}
+const resolveMongoId = (comId) => {
+  const isObjectId = /^[0-9a-fA-F]{24}$/.test(comId || '');
+  if (isObjectId) return comId; // it's already a Mongo _id
+
+  // try find by comId OR by stringified _id
+  const match = (comments || []).find(
+    (c) => c.comId === comId || String(c._id) === comId
+  );
+  return match?._id || null;
+};
+
+const onEditAction = async(data) => {
+  const { comId , text } = data;
+  const _id = resolveMongoId(comId);
+  if (!_id) {
+    console.error('Cannot find _id for comId:', comId);
+    return;
+  }
+  await editComment(_id , text);
+  await getComments(postid);
+}
+
+const onDeleteAction = async(data) => {
+  const comId= data.comId;
+
+  const match = (comments || []).find(c => c.comId === comId);
+  if (!match?._id) {
+    console.error('Cannot find _id for comId:', comId);
+    return;
+  }
+  deleteComment(match?._id);
+    getComments(postid);  
+}
 
   return (
 
     <div className="w-full max-w-3xl mx-auto px-4 py-6 rcs-wrapper">
       <CommentSection
+   
         currentUser={{
           currentUserId: user?.id || user?.sub || user?._id || 'guest',
           currentUserImg: user?.image || 'https://picsum.photos/200',
@@ -230,17 +290,18 @@ export default function Comments() {
           }
         }}
         // Event Handlers
-        onSubmitAction={(data) => console.log('New Comment:', data)}
-        onReplyAction={(data) => console.log('Reply:', data)}
-        onEditAction={(data) => console.log('Edit:', data)}
-        onDeleteAction={(data) => console.log('Delete:', data)}
+        onSubmitAction={onSubmitAction}
+        onReplyAction={onReplyAction}
+        onEditAction={onEditAction}
+        onDeleteAction={onDeleteAction}
         // No comments message
         customNoComment={() => (
           <div className="text-center py-8 text-gray-400">
             No comments yet. Be the first to comment!
           </div>
         )}
-        commentData={[]}
+        commentData={finalComments || []  }
+       
       />
     </div>
   )

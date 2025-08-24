@@ -12,6 +12,7 @@ export const useAuthStore = create((set) => ({
   post: null,
   posts: null,
   alreadyLiked: false,
+  comment: null,
   updateDashboard: async(data) => {
     try {
       // Build multipart form data so files are transmitted correctly
@@ -85,5 +86,5 @@ export const useAuthStore = create((set) => ({
     } catch (error) {
       set({ error: error?.response?.data?.error || error.message });
     }
-  },
+  }
 }));
