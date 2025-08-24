@@ -17,13 +17,17 @@ callbacks: {
       try {
         await connectDb();
         const currentUser = await User.findOne({ email: user.email });
+        const providerImage = user?.image || profile?.avatar_url || "";
         if (!currentUser) {
-          const newUser = await User.create({
+          await User.create({
             email: user.email,
             username: user.email.split("@")[0],
+            profileImage: providerImage,
           });
-          
-        } 
+        } else if (!currentUser.profileImage && providerImage) {
+          currentUser.profileImage = providerImage;
+          await currentUser.save();
+        }
       } catch (err) {
         console.error('signIn callback error:', err);
         return false; 
@@ -34,11 +38,14 @@ callbacks: {
   async session({ session}) {
     await connectDb();
     const currentUser = await User.findOne({ email: session.user.email });
-    session.user.username = currentUser.username;
-    session.user.profileImage = currentUser.profileImage;
-    session.user.bannerImage = currentUser.bannerImage;
-    session.user.bio = currentUser.bio;
-    session.user._id = currentUser._id;
+    if (currentUser) {
+      session.user.username = currentUser.username;
+      session.user.profileImage = currentUser.profileImage;
+      session.user.bannerImage = currentUser.bannerImage;
+      session.user.bio = currentUser.bio;
+      session.user._id = currentUser._id;
+      session.user.image = currentUser.profileImage || session.user.image;
+    }
     return session
   }
 }

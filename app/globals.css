@@ -24,3 +24,53 @@ body {
   color: var(--foreground); */
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* --- Overrides for react-comments-section emoji alignment --- */
+/* Scope to our wrapper to avoid unintended side-effects */
+.rcs-wrapper .emoji-input {
+  position: relative !important;
+  align-items: stretch;
+}
+
+/* Reposition the emoji icon to the bottom-right inside the input/textarea */
+.rcs-wrapper .emoji-input .emoji-icon {
+  position: absolute !important;
+  right: 12px !important;
+  top: 50% !important;
+  bottom: auto !important;
+  width: 20px !important;
+  height: 20px !important;
+  background-size: 20px 20px !important;
+  opacity: 0.7;
+  filter: invert(85%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(100%);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  transform: translateY(-50%);
+}
+
+.rcs-wrapper .emoji-input .emoji-icon:hover {
+  opacity: 1;
+  transform: translateY(-50%) scale(1.05);
+}
+
+/* Place the emoji picker above the input and align to the right */
+.rcs-wrapper .emoji-picker-react {
+  position: absolute !important;
+  right: 0 !important;
+  top: auto !important;
+  bottom: calc(100% + 8px) !important;
+  z-index: 1000 !important;
+}
+
+/* Ensure input area leaves space for emoji icon on the right */
+.rcs-wrapper .emoji-input textarea,
+.rcs-wrapper .emoji-input input,
+.rcs-wrapper .emoji-input div[contenteditable='true'] {
+  padding-right: 44px !important;
+}
+
+/* Optional: dark-theme tweak for picker if it inherits light styles */
+.emoji-picker-react .emoji-categories label,
+.emoji-picker-react input[type="search"]::placeholder {
+  color: #9ca3af !important;
+}
+
