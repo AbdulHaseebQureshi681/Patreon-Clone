@@ -13,9 +13,24 @@ export const authOptions= NextAuth({
     GoogleProvider(
       {
         clientId: process.env.GOOGLE_ID,
-        clientSecret: process.env.GOOGLE_SECRET
+        clientSecret: process.env.GOOGLE_SECRET,
+        authorization: {
+        params: {
+          // Add Classroom scopes here
+          scope: [
+            "openid",
+            "email",
+            "profile",
+            "https://www.googleapis.com/auth/classroom.courses.readonly",
+            "https://www.googleapis.com/auth/classroom.rosters.readonly",
+          ].join(" "),
+          // Ensure you get refresh tokens
+          access_type: "offline",
+          prompt: "consent",
+          response_type: "code",
+        },
       }
-    )
+ } )
 
 
   ],
