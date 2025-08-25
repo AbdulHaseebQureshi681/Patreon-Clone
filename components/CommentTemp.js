@@ -28,12 +28,29 @@ const onSubmitAction = (data) => {
     uploadComment({text:text , parentid:null ,userid:userId ,comId:comId,postid:postid});
    
 }
+const onReplyAction = async (data) => {
+  console.log('onReplyAction', data);
+  const { text, userId, comId } = data;
+  const decodedPostId = postid ? decodeURIComponent(postid) : postid;
+  // identify the parent using common keys from react-comments-section (varies by version)
+  const parentIdentifier =
+    data.parentId ||
+    data.parentComId ||
+    data.repliedToCommentId ||
+    data.parentOfRepliedCommentId ||
+    data.replyToComId ||
+    data.replyToId;
+  // remap to ROOT ancestor so replies always attach to the top-level comment
+  const targetRootComId = getRootComId(parentIdentifier);
+  const parentMongoId = resolveMongoId(targetRootComId);
 
-const onReplyAction = (data) => {
-  console.log(data);
-  const {text ,userId ,comId , parentid} = data;
- 
-  // uploadComment({text:text , parentid:parentid ,userid:userId ,comId:comId,postid:postid});
+  if (!parentMongoId) {
+    console.error('Cannot resolve parent Mongo _id from:', parentIdentifier, 'data:', data);
+    return;
+  }
+
+  await uploadComment({ text, parentid: parentMongoId, userid: userId, comId, postid: decodedPostId });
+  await getComments(decodedPostId);
 }
 const resolveMongoId = (comId) => {
   const isObjectId = /^[0-9a-fA-F]{24}$/.test(comId || '');
@@ -44,6 +61,18 @@ const resolveMongoId = (comId) => {
     (c) => c.comId === comId || String(c._id) === comId
   );
   return match?._id || null;
+};
+
+// Given a comment's comId, walk up using the flat comments array and return the ROOT comId
+const getRootComId = (startComId) => {
+  if (!startComId) return startComId;
+  const byComId = new Map((comments || []).map(c => [c.comId, c]));
+  let node = byComId.get(startComId) || null;
+  if (!node) return startComId; // fallback
+  while (node && node.parentComId) {
+    node = byComId.get(node.parentComId) || null;
+  }
+  return node?.comId || startComId;
 };
 
 const onEditAction = async(data) => {
@@ -65,8 +94,8 @@ const onDeleteAction = async(data) => {
     console.error('Cannot find _id for comId:', comId);
     return;
   }
-  deleteComment(match?._id);
-    getComments(postid);  
+  await deleteComment(match?._id);
+    await getComments(postid);  
 }
 
   return (
@@ -301,7 +330,7 @@ const onDeleteAction = async(data) => {
           </div>
         )}
         commentData={finalComments || []  }
-       
+        
       />
     </div>
   )

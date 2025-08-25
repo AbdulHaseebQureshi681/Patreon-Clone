@@ -8,7 +8,9 @@ export function toReactCommentsTree(apiComments = []) {
       userProfile: c.user?.image || 'https://picsum.photos/200',
       text: c.text,
       createdAt: c.createdAt,
-      replies: [],
+      replies: [
+        
+      ],
       parentComId: c.parentComId || null,
     }));
   

@@ -21,13 +21,33 @@ export const POST = async (req) => {
         if (!text) {
             return NextResponse.json({ error: "text is required" }, { status: 400 });
         }
-       
+        // Determine parent and depth safely
+        let depth = 0;
+        let parentRef = null;
+        if (parentid) {
+            if (!mongoose.Types.ObjectId.isValid(parentid)) {
+                return NextResponse.json({ error: "Invalid parentid" }, { status: 400 });
+            }
+            const parent = await Comment.findById(parentid).select('post depth');
+            if (!parent) {
+                return NextResponse.json({ error: "Parent comment not found" }, { status: 404 });
+            }
+            if (String(parent.post) !== String(postid)) {
+                return NextResponse.json({ error: "Parent comment does not belong to the same post" }, { status: 400 });
+            }
+            if (parent.depth >= 5) {
+                return NextResponse.json({ error: "Maximum reply depth reached" }, { status: 400 });
+            }
+            depth = parent.depth + 1;
+            parentRef = parentid;
+        }
+
         const comment = new Comment({
-            post:postid,
+            post: postid,
             user: userid,
             text,
-            parent: parentid,
-            depth: parentid ? 1 : 0,
+            parent: parentRef,
+            depth,
             comId: comId,
         });
         await comment.save();
