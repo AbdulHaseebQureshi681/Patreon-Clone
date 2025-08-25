@@ -3,6 +3,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import SessionWrapper from "@/components/SessionWrapper";
+import { ConvexClientProvider } from "@/components/ConvexClientProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,8 +29,9 @@ export default function RootLayout({ children }) {
         <SessionWrapper>
         <Navbar />
         <div className="flex-1 [background:radial-gradient(125%_125%_at_50%_10%,#000_40%,#63e_100%)]">
-        
-          {children}
+          <ConvexClientProvider>
+            {children}
+          </ConvexClientProvider>
         </div>
         <Footer />
         </SessionWrapper>
