@@ -13,6 +13,19 @@ export const useAuthStore = create((set) => ({
   posts: null,
   alreadyLiked: false,
   comment: null,
+  updatedUser: null,
+  updateUser: async(email) => {
+    try {
+      if (!email) throw new Error('Email is required');
+      const response = await axios.get(`${API_URL}/api/GetDashData?email=${encodeURIComponent(email)}`);
+      if (response.data.user) {
+        set({ updatedUser: response.data.user, error: null });
+      } 
+    } catch (error) {
+      console.error('Error updating user:', error);
+      set({ error: error?.response?.data?.error || error.message });
+    }
+  },
   updateDashboard: async(data) => {
     try {
       // Build multipart form data so files are transmitted correctly
@@ -38,6 +51,10 @@ export const useAuthStore = create((set) => ({
   },
   getUser: async(username) => {
     try {
+      if (!username) {
+        set({ error: "Username is required" });
+        return;
+      }
       const response = await axios.get(`${API_URL}/api/getuser/${username}`);
       set({ requestedUser: response.data.user, error: null });
     } catch (error) {

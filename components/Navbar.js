@@ -1,10 +1,18 @@
 "use client";
-import React ,{useState} from "react";
+import React ,{useState, useEffect} from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useAuthStore } from "@/store/dashboardHandler";
 import { useSession, signIn, signOut } from "next-auth/react";
 const Navbar = () => {
+  const { updatedUser , updateUser } = useAuthStore();
+
   const { data: session } = useSession();
+   useEffect(() => {
+      if (session?.user?.email) {
+        updateUser(session.user.email);
+      }
+    }, [session?.user?.email, updateUser]);
   const [showDropDown, setShowDropDown] = useState(false);
   return (
     <nav className="bg-gray-800    text-white flex justify-between px-4 h-16 items-center">
@@ -29,7 +37,7 @@ const Navbar = () => {
             className="ml-2 text-white bg-gray-700 hover:bg-gray-600 focus:ring-4 focus:outline-none focus:ring-gray-300 font-medium rounded-lg text-sm px-3 py-2 text-center inline-flex items-center dark:bg-gray-600 dark:hover:bg-gray-500 dark:focus:ring-gray-800"
             type="button"
           >
-            Welcome {session.user.name}
+            Welcome {updatedUser?.name || session?.user?.name}
             <svg
               className="w-2.5 h-2.5 ms-2"
               aria-hidden="true"

@@ -8,32 +8,49 @@ import { toast } from "react-hot-toast";
 import { Toaster } from "react-hot-toast";
 const Dashboard = () => {
   const { data: session } = useSession();
-  const {dashUser,error,updateDashboard} = useAuthStore();
+  const { updateDashboard, updateUser, updatedUser } = useAuthStore();
   const router = useRouter();
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset
-  } = useForm(
-    {
-      defaultValues:{
-        name:session?.user?.name,
-        email:session?.user?.email,
-        username:session?.user?.username,
-        profileImage:session?.user?.profileImage,
-        bannerImage:session?.user?.bannerImage,
-        bio:session?.user?.bio
-      }
+  } = useForm({
+    defaultValues: {
+      name: updatedUser?.name || session?.user?.name || '',
+      email: updatedUser?.email || session?.user?.email || '',
+      username: updatedUser?.username || session?.user?.username || '',
+      bio: updatedUser?.bio || session?.user?.bio || ''
     }
-  );
+  });
+
+  // Fetch user data on component mount
+  useEffect(() => {
+    if (session?.user?.email) {
+      updateUser(session.user.email);
+    }
+  }, [session?.user?.email, updateUser]);
+
+  // Update form when user data changes
+  useEffect(() => {
+    if (updatedUser) {
+      reset({
+        name: updatedUser.name,
+        email: updatedUser.email,
+        username: updatedUser.username,
+        bio: updatedUser.bio
+      });
+    }
+  }, [updatedUser, reset]);
+
   const [preview, setPreview] = useState(null);
   const [imgError, setImgError] = useState(null);
   const [bannerPreview, setBannerPreview] = useState(null);
   const [bannerImgError, setBannerImgError] = useState(null);
   const [isPending,setIsPending] = useState(false);
+ 
 
-  useEffect(() => {
+useEffect(() => {
     if (!session) {
       router.push("/login");
     }
@@ -49,22 +66,28 @@ const Dashboard = () => {
     if (imgError || bannerImgError) return; // guard when image invalid
     setIsPending(true);
     try {
+      // Update the dashboard first
       await updateDashboard({
-        name:data.name,
-        email:data.email,
-        username:data.username,
-        profileImage:data.profileImage,
-        bannerImage:data.bannerImage,
-        bio:data.bio
+        name: data.name,
+        email: data.email,
+        username: data.username,
+        profileImage: data.profileImage,
+        bannerImage: data.bannerImage,
+        bio: data.bio
       });
-       
+      
+      // Fetch updated user data
+      await updateUser(data.email);
+      
+      toast.success("Profile updated successfully");
+      
+      // Refresh the page to update the session
+      router.refresh();
     } catch (err) {
-     toast.error("Profile update failed");
+      toast.error(err?.message || "Profile update failed");
     } finally {
       setIsPending(false);
     }
-    reset();
-    toast.success("Profile updated successfully");
   };
 
 const handleProfileImageChange = (e) => {
@@ -329,7 +352,6 @@ const handleBannerImageChange = (e) => {
       </div>
       <Toaster />
     </div>
-
   );
 };
 
