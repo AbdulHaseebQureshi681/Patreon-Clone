@@ -3,6 +3,7 @@ import GitHubProvider from "next-auth/providers/github"
 import GoogleProvider from "next-auth/providers/google"
 import User from "@/models/User"
 import connectDb from "@/db/connectDb"
+import { StreamChat } from "stream-chat"
 
 const handler = NextAuth({
   providers: [
@@ -15,35 +16,47 @@ const handler = NextAuth({
       clientSecret: process.env.GOOGLE_SECRET,
     }),
   ],
-  secret: process.env.NEXTAUTH_SECRET,
-  session: {
-    strategy: "jwt",
-  },
+  
+ 
   callbacks: {
     async signIn({ user, account, profile }) {
       try {
         await connectDb()
-        const currentUser = await User.findOne({ email: user.email })
+        let currentUser = await User.findOne({ email: user.email })
         const providerImage = user?.image || profile?.avatar_url || ""
-
+        // creating user token
         if (!currentUser) {
-          await User.create({
+          const newUser = await User.create({
             email: user.email,
             username: user.email.split("@")[0],
             profileImage: providerImage,
           })
+          currentUser = newUser
         } else if (!currentUser.profileImage && providerImage) {
           currentUser.profileImage = providerImage
           await currentUser.save()
         }
+        const chatClient = StreamChat.getInstance(process.env.STREAM_KEY, process.env.STREAM_SECRET);
+        const token = chatClient.createToken(currentUser._id.toString());
+        user.streamChatToken = token;
+        user._id = currentUser._id.toString(); // Convert ObjectId to string
       } catch (err) {
         console.error("signIn callback error:", err)
         return false
       }
-      return true
+      return user
     },
-    async session({ session }) {
+    async jwt({ token, user }) {
+      if (user) {
+        token.streamChatToken = user.streamChatToken;
+        token.uid = user._id;
+      }
+      return token;
+    },
+    async session({ session, token }) {
       await connectDb()
+      session.user._id = token.uid;
+      session.user.id = token.uid; // Set the 'id' field for client-side consumption
       const currentUser = await User.findOne({ email: session.user.email })
 
       if (currentUser) {
@@ -52,9 +65,9 @@ const handler = NextAuth({
         session.user.profileImage = currentUser.profileImage
         session.user.bannerImage = currentUser.bannerImage
         session.user.bio = currentUser.bio
-        session.user._id = currentUser._id
         session.user.image = currentUser.profileImage || session.user.image
       }
+      session.user.streamChatToken = token.streamChatToken || null;
       return session
     },
     async updateUser({ user, session }) {
