@@ -1,11 +1,12 @@
 "use client"
 import { User, Channel as StreamChannel } from 'stream-chat';
-import { useCreateChatClient, Chat, Channel, ChannelHeader, MessageInput, MessageList, Thread, Window } from 'stream-chat-react';
+import { useCreateChatClient, Chat, Channel, ChannelHeader, MessageInput, ChannelList,MessageList, Thread, Window  , useMessageContext} from 'stream-chat-react';
 import { useState , useEffect } from 'react';
 import 'stream-chat-react/dist/css/v2/index.css';
 import { useSession } from 'next-auth/react';
 import {StreamChat} from 'stream-chat';
 import { useParams } from 'next/navigation';
+import "@/app/layout.css"
 // your Stream app information
 
 export default function Page() {
@@ -54,8 +55,25 @@ export default function Page() {
   
     if (!client || !channel) return <div>Loading chat...</div>;
 
-  return <Chat client={client}>
-      <Channel channel={channel}>
+    const ChannelSort = { last_message_at: -1 };
+    const ChannelFilters = {
+      members: { $in: [userId] },
+    };
+    const ChannelOptions = {
+      limit: 10,
+    };
+    // const CustomMessage = () => {
+    //   const { message } = useMessageContext();
+    //   return (
+    //     <div>
+    //       <b style={{ marginRight: '4px' }}>{message.user?.name}</b> {message.text}
+    //     </div>
+    //   );
+    // };
+  return <Chat client={client} theme='str-chat__theme-custom' >
+    <div className="str-chat__main-layout">
+     <ChannelList filters={ChannelFilters} sort={ChannelSort} options={ChannelOptions} />
+      <Channel >
         <Window>
           <ChannelHeader />
           <MessageList />
@@ -63,5 +81,6 @@ export default function Page() {
         </Window>
         <Thread />
       </Channel>
+    </div>
     </Chat>;
     }
