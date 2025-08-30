@@ -40,6 +40,7 @@ const handler = NextAuth({
         const token = chatClient.createToken(currentUser._id.toString());
         user.streamChatToken = token;
         user._id = currentUser._id.toString(); // Convert ObjectId to string
+        console.log("signIn callback: user after modification", user);
       } catch (err) {
         console.error("signIn callback error:", err)
         return false
@@ -51,6 +52,7 @@ const handler = NextAuth({
         token.streamChatToken = user.streamChatToken;
         token.uid = user._id;
       }
+      console.log("jwt callback: token after modification", token);
       return token;
     },
     async session({ session, token }) {
@@ -68,6 +70,7 @@ const handler = NextAuth({
         session.user.image = currentUser.profileImage || session.user.image
       }
       session.user.streamChatToken = token.streamChatToken || null;
+      console.log("session callback: session after modification", session);
       return session
     },
     async updateUser({ user, session }) {

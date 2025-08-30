@@ -43,3 +43,13 @@ body {
   width: auto; /* Override previous fixed width */
 }
 
+@media screen and (min-width: 768px) {
+    .str-chat-channel-list--open {
+      width: 100%;
+    }
+    .str-chat-channel-list {
+      position: fixed;
+      z-index: 1;
+      width: 0;
+    }
+  }
