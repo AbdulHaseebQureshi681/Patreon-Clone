@@ -5,7 +5,7 @@ import User from "@/models/User"
 import connectDb from "@/db/connectDb"
 import { StreamChat } from "stream-chat"
 
-const handler = NextAuth({
+export const authOptions = {
   providers: [
     GitHubProvider({
       clientId: process.env.GITHUB_ID,
@@ -16,15 +16,12 @@ const handler = NextAuth({
       clientSecret: process.env.GOOGLE_SECRET,
     }),
   ],
-  
- 
   callbacks: {
     async signIn({ user, account, profile }) {
       try {
         await connectDb()
         let currentUser = await User.findOne({ email: user.email })
         const providerImage = user?.image || profile?.avatar_url || ""
-        // creating user token
         if (!currentUser) {
           const newUser = await User.create({
             email: user.email,
@@ -39,7 +36,7 @@ const handler = NextAuth({
         const chatClient = StreamChat.getInstance(process.env.STREAM_KEY, process.env.STREAM_SECRET);
         const token = chatClient.createToken(currentUser._id.toString());
         user.streamChatToken = token;
-        user._id = currentUser._id.toString(); // Convert ObjectId to string
+        user._id = currentUser._id.toString();
         console.log("signIn callback: user after modification", user);
       } catch (err) {
         console.error("signIn callback error:", err)
@@ -58,7 +55,7 @@ const handler = NextAuth({
     async session({ session, token }) {
       await connectDb()
       session.user._id = token.uid;
-      session.user.id = token.uid; // Set the 'id' field for client-side consumption
+      session.user.id = token.uid;
       const currentUser = await User.findOne({ email: session.user.email })
 
       if (currentUser) {
@@ -88,6 +85,8 @@ const handler = NextAuth({
       }
     }
   }
-})
+};
+
+const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST }

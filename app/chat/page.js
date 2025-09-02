@@ -5,13 +5,15 @@ import { useState , useEffect } from 'react';
 import 'stream-chat-react/dist/css/v2/index.css';
 import { useSession } from 'next-auth/react';
 import {StreamChat} from 'stream-chat';
-import { useParams } from 'next/navigation';
 import "@/app/layout.css"
+import AddChannelButton from '@/components/AddChannelButton';
+import { useChannelsStore } from "@/store/channels"
 // your Stream app information
 
 export default function Page() {
+    const { createChannel } = useChannelsStore();
+
     const { data: session, status } = useSession();
-    const {slug} = useParams();
 
     const apiKey = process.env.NEXT_PUBLIC_STREAM_KEY;
     const userId = session?.user?.id || session?.user?._id;
@@ -20,7 +22,16 @@ export default function Page() {
   const [channel, setChannel] = useState(null);
 
   const [client, setClient] = useState(null);
-  
+  const onAddChannel = async ()=>{
+    const channelData = {
+      channelType: 'messaging',
+      channelId: 'new-channel-2id',
+      channelName: 'ahhh88',
+      members: [userId],
+      channelData: {}
+    };
+    await createChannel(channelData);
+  }
     useEffect(() => {
       if (status !== "authenticated" || !apiKey || !userToken || !userId) {
         if (status === "loading") return; // Do nothing while loading
@@ -47,13 +58,13 @@ export default function Page() {
       };
     }, [apiKey, userToken, userId, userName, status]);
   
-    const userid2 = "68ad1fa3c0cc8ad2d6a03d04"
+
     useEffect(() => {
       if (!client || !userId) return;
   
-      const channel = client.channel('messaging', slug, {
+      const channel = client.channel('messaging', "jkjk", {
         image: 'https://getstream.io/random_png/?name=react',
-        name: slug || 'Chat Room',
+        name: 'Chat Room',
         members: [userId], // Start with only current user
       });
   
@@ -63,17 +74,10 @@ export default function Page() {
       channel.watch().then(() => {
         console.log("Channel watched successfully:", channel);
         // After channel is created, add the second user
-        if (userId !== userid2) {
-          channel.addMembers([userid2]).then(() => {
-            console.log("Second user added to channel successfully");
-          }).catch(error => {
-            console.error("Error adding second user to channel:", error);
-          });
-        }
       }).catch(error => {
         console.error("Error watching channel:", error);
       });
-    }, [client, userId, slug]);
+    }, [client, userId]);
   
     if (!client || !channel) return <div>Loading chat...</div>;
   
@@ -147,6 +151,8 @@ export default function Page() {
         }}
        />
         <Channel >
+            <AddChannelButton onAddChannel={onAddChannel} />
+
           <Window>
             <ChannelHeader />
             <MessageList 
