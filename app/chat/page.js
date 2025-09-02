@@ -8,9 +8,12 @@ import {StreamChat} from 'stream-chat';
 import "@/app/layout.css"
 import AddChannelButton from '@/components/AddChannelButton';
 import { useChannelsStore } from "@/store/channels"
+import { Button } from '@/components/ui/button';
+import AddChannelForm from '@/components/AddChannelForm';
 // your Stream app information
 
 export default function Page() {
+    const [showAddChannelForm, setShowAddChannelForm] = useState(false);
     const { createChannel } = useChannelsStore();
 
     const { data: session, status } = useSession();
@@ -133,6 +136,11 @@ export default function Page() {
     return <Chat client={client} theme='str-chat__theme-custom' >
       <div className="str-chat__main-layout ">
         {/* <ChannelSearch/> */}
+        <AddChannelForm 
+          className={`${showAddChannelForm ? 'block' : 'hidden'}`} 
+          onSubmit={onAddChannel}
+          onClose={() => setShowAddChannelForm(false)}
+        />
        <ChannelList 
          filters={ChannelFilters} 
          sort={ChannelSort} 
@@ -151,7 +159,7 @@ export default function Page() {
         }}
        />
         <Channel >
-            <AddChannelButton onAddChannel={onAddChannel} />
+            <Button onClick={() => setShowAddChannelForm(true)}>Add Channel</Button>
 
           <Window>
             <ChannelHeader />
