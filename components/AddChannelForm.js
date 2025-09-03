@@ -44,7 +44,7 @@ const AddChannelForm = ({className, onClose}) => {
       const formDataWithMembers = {
         channelName: data.channelName,
         channelDescription: data.channelDescription,
-        channelType: "messaging", // Default channel type
+        channelType: "team", // Use team type for better permissions
         channelId: channelId, // Use sanitized ID
         members: [currentUserId, ...selectedMembers.map(member => member._id)], // Include current user + selected members
         channelData: {

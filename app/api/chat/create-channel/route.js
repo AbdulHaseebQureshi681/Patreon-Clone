@@ -11,7 +11,7 @@ export async function POST(request) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const { channelType = "messaging", channelId, channelName, members = [], channelData = {} } =
+        const { channelType = "team", channelId, channelName, members = [], channelData = {} } =
             await request.json();
 
         const chatClient = StreamChat.getInstance(
@@ -32,11 +32,6 @@ export async function POST(request) {
             name: channelName,
             created_by_id: userId,
             members: allMembers,
-            // Add permission settings for the channel
-            permissions: {
-                // Allow all members to read, write, and manage the channel
-                'user': ['read-channel', 'send-message', 'upload-file'],
-            },
             ...channelData,
         });
 

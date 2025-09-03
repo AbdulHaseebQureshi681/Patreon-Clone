@@ -28,7 +28,7 @@ export default function Page() {
   const [client, setClient] = useState(null);
   const onAddChannel = async ()=>{
     const channelData = {
-      channelType: 'messaging',
+      channelType: 'team',
       channelId: 'new-channel-2id',
       channelName: 'ahhh88',
       members: [userId],
@@ -66,7 +66,7 @@ export default function Page() {
     useEffect(() => {
       if (!client || !userId) return;
   
-      const channel = client.channel('messaging', "jkjk", {
+      const channel = client.channel('team', "jkjk", {
         image: 'https://getstream.io/random_png/?name=react',
         name: 'Chat Room',
         members: [userId], // Start with only current user
