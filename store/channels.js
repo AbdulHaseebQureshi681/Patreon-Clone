@@ -9,6 +9,7 @@ axios.defaults.withCredentials = true;
 export const useChannelsStore = create((set) => ({
     error: null,
     channel: null,
+    users: [],
 
  createChannel: async({channelType, channelId, channelName, members, channelData}) => {
    try {
@@ -20,6 +21,14 @@ export const useChannelsStore = create((set) => ({
        channelData
      });
      set({ channel: response.data.channel, error: null });
+   } catch (error) {
+     set({ error: error?.response?.data?.error || error.message });
+   }
+ },
+ getAllUsers: async () => {
+   try {
+     const response = await axios.get(`${API_URL}/api/getalluser`);
+     set({ users: response.data.users, error: null });
    } catch (error) {
      set({ error: error?.response?.data?.error || error.message });
    }

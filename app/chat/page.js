@@ -1,6 +1,6 @@
 "use client"
 import { User, Channel as StreamChannel } from 'stream-chat';
-import { useCreateChatClient, Chat, Channel, ChannelHeader, MessageInput, ChannelList,MessageList, Thread, Window  , ChannelSearch , InfiniteScroll} from 'stream-chat-react';
+import { useCreateChatClient, Chat, Channel, ChannelHeader, MessageInput, ChannelList, MessageList, Thread, Window, ChannelSearch, InfiniteScroll} from 'stream-chat-react';
 import { useState , useEffect } from 'react';
 import 'stream-chat-react/dist/css/v2/index.css';
 import { useSession } from 'next-auth/react';
@@ -135,31 +135,40 @@ export default function Page() {
   
     return <Chat client={client} theme='str-chat__theme-custom' >
       <div className="str-chat__main-layout ">
-        {/* <ChannelSearch/> */}
         <AddChannelForm 
           className={`${showAddChannelForm ? 'block' : 'hidden'}`} 
           onSubmit={onAddChannel}
           onClose={() => setShowAddChannelForm(false)}
         />
-       <ChannelList 
-         filters={ChannelFilters} 
-         sort={ChannelSort} 
-         options={ChannelOptions} 
-         Paginator={InfiniteScroll}
-         showChannelSearch
-         additionalChannelSearchProps={{
-          searchFunction: (params, event) => {
-            return customSearchFunction(params, event, client);
-          },
-        }}
-        // Infinite scroll configuration for channel list
-        additionalChannelListProps={{
-          loadMore: true, // Enable load more functionality
-          loadMoreThreshold: 0.8, // Load more when 80% scrolled
-        }}
-       />
+        
+        <div className="str-chat__channel-list">
+          <ChannelList 
+            filters={ChannelFilters} 
+            sort={ChannelSort} 
+            options={ChannelOptions} 
+            Paginator={InfiniteScroll}
+            showChannelSearch={true}
+            additionalChannelSearchProps={{
+              searchFunction: (params, event) => {
+                return customSearchFunction(params, event, client);
+              },
+            }}
+            additionalChannelListProps={{
+              loadMore: true,
+              loadMoreThreshold: 0.8,
+            }}
+          />
+          {/* Add Channel button positioned after the channel list */}
+          <div className="p-3 border-t border-gray-200 bg-gray-50 sticky bottom-0">
+            <Button 
+              onClick={() => setShowAddChannelForm(true)}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm"
+            >
+              + Add Channel
+            </Button>
+          </div>
+        </div>
         <Channel >
-            <Button onClick={() => setShowAddChannelForm(true)}>Add Channel</Button>
 
           <Window>
             <ChannelHeader />
