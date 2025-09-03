@@ -10,12 +10,13 @@ import AddChannelButton from '@/components/AddChannelButton';
 import { useChannelsStore } from "@/store/channels"
 import { Button } from '@/components/ui/button';
 import AddChannelForm from '@/components/AddChannelForm';
+import {Menu, X} from 'lucide-react';
 // your Stream app information
 
 export default function Page() {
     const [showAddChannelForm, setShowAddChannelForm] = useState(false);
     const { createChannel } = useChannelsStore();
-
+    const [isOpen, setIsOpen] = useState(false);
     const { data: session, status } = useSession();
 
     const apiKey = process.env.NEXT_PUBLIC_STREAM_KEY;
@@ -139,8 +140,9 @@ export default function Page() {
           className={`${showAddChannelForm ? 'block' : 'hidden'}`} 
           onSubmit={onAddChannel}
           onClose={() => setShowAddChannelForm(false)}
-        />
-        
+          />
+        <div className={`str-chat__channel-list-wrapper fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0 md:z-auto md:w-auto`}>
+
         <div className="str-chat__channel-list">
           <ChannelList 
             filters={ChannelFilters} 
@@ -157,18 +159,20 @@ export default function Page() {
               loadMore: true,
               loadMoreThreshold: 0.8,
             }}
-          />
+            />
           {/* Add Channel button positioned after the channel list */}
           <div className="p-3 border-t border-gray-200 bg-gray-50 sticky bottom-0">
             <Button 
               onClick={() => setShowAddChannelForm(true)}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors text-sm"
-            >
+              >
               + Add Channel
             </Button>
           </div>
+              </div>
         </div>
         <Channel >
+            <Button className="block md:hidden absolute top-4 right-4" onClick={() => setIsOpen(!isOpen)}> {isOpen ? <X size={28} /> : <Menu size={28} />} </Button>
 
           <Window>
             <ChannelHeader />

@@ -32,61 +32,13 @@ body {
   height: 100%;
 }
 
-.str-chat__channel-list {
-  width: 280px; /* Fixed width for the channel list */
-  flex-shrink: 0; /* Prevent channel list from shrinking */
-  border-right: 1px solid #e0e0e0; /* Add a subtle border */
-}
+
 
 .str-chat__channel {
   flex-grow: 1; /* Allow channel to take up remaining space */
   width: auto; /* Override previous fixed width */
 }
 
-@media screen and (min-width: 768px) {
-    .str-chat-channel-list--open {
-      width: 100%;
-    }
-    .str-chat-channel-list {
-      position: fixed;
-      z-index: 1;
-      width: 0;
-    }
-  }
-
-/* Fixed height chat container */
-/* .str-chat__message-list {
-  height: 400px !important;
-  max-height: 400px !important;
-  min-height: 400px !important;
-  overflow-y: auto !important;
-  flex: 1 !important;
-} */
-
-/* Ensure the chat window maintains consistent size
-.str-chat__channel {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-} */
-
-/* Constrain the message list container */
-/* .str-chat__message-list-container {
-  height: 400px !important;
-  max-height: 400px !important;
-  overflow: hidden !important;
-} */
-
-/* Fixed height for the entire chat window */
-/* .str-chat__window {
-  height: 600px !important;
-  max-height: 600px !important;
-  min-height: 600px !important;
-  display: flex !important;
-  flex-direction: column !important;
-} */
-
-/* Ensure the message list takes remaining space within the window */
 .str-chat__window .str-chat__message-list {
   flex: 1 !important;
   height: auto !important;
@@ -97,3 +49,10 @@ body {
 .str-chat__main-layout {
   height: 95vh;
 }
+
+/* .str-chat__channel-list{
+  @media screen and (max-width: 600px) {
+    display: none;
+    
+  }
+} */
