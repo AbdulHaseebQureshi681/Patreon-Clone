@@ -82,6 +82,20 @@ export default function Page() {
         console.error("Error watching channel:", error);
       });
     }, [client, userId]);
+
+    // Close sidebar when clicking outside or pressing Escape
+    useEffect(() => {
+      const handleEscape = (e) => {
+        if (e.key === 'Escape') {
+          setIsOpen(false);
+        }
+      };
+
+      if (isOpen) {
+        document.addEventListener('keydown', handleEscape);
+        return () => document.removeEventListener('keydown', handleEscape);
+      }
+    }, [isOpen]);
   
     if (!client || !channel) return <div>Loading chat...</div>;
   
@@ -140,7 +154,16 @@ export default function Page() {
           className={`${showAddChannelForm ? 'block' : 'hidden'}`} 
           onSubmit={onAddChannel}
           onClose={() => setShowAddChannelForm(false)}
+        />
+        
+        {/* Mobile backdrop - only visible on mobile when sidebar is open */}
+        {isOpen && (
+          <div 
+            className="fixed inset-0 bg-black opacity-60 z-40 md:hidden"
+            onClick={() => setIsOpen(false)}
           />
+        )}
+        
         <div className={`str-chat__channel-list-wrapper fixed inset-y-0 left-0 z-50 w-64 transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0 md:z-auto md:w-auto`}>
 
         <div className="str-chat__channel-list">
@@ -171,8 +194,12 @@ export default function Page() {
           </div>
               </div>
         </div>
+
+        
+
+
         <Channel >
-            <Button className="block md:hidden absolute top-4 right-4" onClick={() => setIsOpen(!isOpen)}> {isOpen ? <X size={28} /> : <Menu size={28} />} </Button>
+            <Button className="block md:hidden absolute top-4 right-4 z-80" onClick={() => setIsOpen(!isOpen)}> {isOpen ? <X size={28} /> : <Menu size={28} />} </Button>
 
           <Window>
             <ChannelHeader />
@@ -184,6 +211,7 @@ export default function Page() {
           </Window>
           <Thread />
         </Channel>
-      </div>
+         </div>
+ 
       </Chat>;
       }
